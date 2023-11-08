@@ -4,6 +4,8 @@
 #endif // INCLUDES_H
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <sstream>
 using namespace std;
 typedef std::string str;
 

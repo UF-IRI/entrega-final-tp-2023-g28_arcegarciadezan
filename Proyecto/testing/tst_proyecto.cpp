@@ -28,7 +28,7 @@ TEST_CASE("CASO 1")
     for(i=0;i< Gimnasio->actividades[0].CantHorarios;i++)
         Gimnasio->actividades[0].cupos[i]=45;
     //----HORARIO----
-    Gimnasio->actividades[0].horarios[0]=8;//10,12,16,18
+    Gimnasio->actividades[0].horarios[0]=8;
     Gimnasio->actividades[0].horarios[1]=10;
     Gimnasio->actividades[0].horarios[2]=12;
     Gimnasio->actividades[0].horarios[3]=16;
@@ -56,7 +56,7 @@ TEST_CASE("CASO 1")
     for(i=0;i< Gimnasio->actividades[1].CantHorarios;i++)
         Gimnasio->actividades[1].cupos[i]=30;
     //----HORARIO----
-    Gimnasio->actividades[1].horarios[0]=8;//9,10,12,18,19
+    Gimnasio->actividades[1].horarios[0]=8;
     Gimnasio->actividades[1].horarios[1]=17;
     Gimnasio->actividades[1].horarios[2]=18;
     Gimnasio->actividades[1].horarios[3]=19;
@@ -68,11 +68,9 @@ TEST_CASE("CASO 1")
     Gimnasio->actividades[1].IdClase[3]=33;
 
 
-
-/*
     SECTION("buscar"){
         int posH,posN;//posH1,posN1,posN3,posH3;
-        posN=BuscarActividadPorNombre(*Gimnasio,"Pilates");
+        posN=BuscarActividadPorNombre(*Gimnasio,"ASdo");
         CHECK(posN!=-1);
         //posH=BuscarActividadPorHorario(*Gimnasio,18,"Spinning");
         //CHECK(posH==0);//Falso
@@ -87,7 +85,7 @@ TEST_CASE("CASO 1")
         posH=BuscarActividadPorHorario(*Gimnasio,19,posN);
         CHECK(posH==-4);
     }
-    */
+
     //CLIENTES
     Gimnasio->ClientesMax=300;
     Gimnasio->CantClientes=4;
@@ -97,7 +95,7 @@ TEST_CASE("CASO 1")
     Gimnasio->clientes[2]={"Sidney","Runolfsson","Sidney.Runolfsson@hotmail.com","1 (433) 165-6466",{"Spinning","","Spinning"},{1,4,2000},3,1,{2,0,3},{10,0,12},};
     Gimnasio->clientes[3]={"Emma","O'Connell","Emma_OConnell@gmail.com","1 (493) 966-7600",{"Spinning","Spinning","Spinning"},{12,1,1995},2,0,{1,1,3},{8,8,12}};
 
-  /*  SECTION("chequeoAct"){
+    SECTION("chequeoAct"){
         int pos0,posH,posN;
         posN=BuscarActividadPorNombre(*Gimnasio,"Spiing");
         posH=BuscarActividadPorHorario(*Gimnasio,8,posN);
@@ -108,7 +106,8 @@ TEST_CASE("CASO 1")
         //CHECK(pos0==2);//dio falso correctamente
         //pos0=ChequeoActs(Gimnasio->clientes[2],*Gimnasio,posH,posN);
         //CHECK(pos0==1);//dio verdadero correctamente
-    }*/
+    }
+
 
     SECTION("RESERVA"){
         int posN,posH,posrepeN;
@@ -131,9 +130,55 @@ TEST_CASE("CASO 1")
     }
     delete[] Gimnasio->clientes;
 
+
+    delete Gimnasio;
+}
+TEST_CASE("Inicializacion"){
+    Sgym* Gimnasio=new Sgym;
+
+    inicializarVariablesFijas(Gimnasio);
+
+    CHECK(Gimnasio->actividades[3].cupos[0]==40);
+
+
+    for (int i = 0; i < Gimnasio->CantClases; ++i) {
+        delete[] Gimnasio->actividades[i].horarios;
+        delete[] Gimnasio->actividades[i].cupos;
+        delete[] Gimnasio->actividades[i].IdClase;
+    }
+    delete[] Gimnasio->actividades;
+    delete[] Gimnasio->musculacion->horarios;
+    delete[] Gimnasio->musculacion->iDClase;
+    delete Gimnasio->musculacion;
+
     delete Gimnasio;
 
+}
+TEST_CASE("Archivos"){
+    Sgym* Gimnasio=new Sgym;
+    inicializarVariablesFijas(Gimnasio);
+    ifstream InputActividades;
+    InputActividades.open("../iriClasesGYM.csv");
 
+    SECTION("LeerArchivos"){
+        LeerArchivoActividades(InputActividades,Gimnasio);
+        REQUIRE(Gimnasio!=nullptr);
+        CHECK(Gimnasio->actividades[4].horarios[3]==16);
+    }
+
+
+
+    InputActividades.close();
+    for (int i = 0; i < Gimnasio->CantClases; ++i) {
+        delete[] Gimnasio->actividades[i].horarios;
+        delete[] Gimnasio->actividades[i].cupos;
+        delete[] Gimnasio->actividades[i].IdClase;
+    }
+    delete[] Gimnasio->actividades;
+    delete[] Gimnasio->musculacion->horarios;
+    delete[] Gimnasio->musculacion->iDClase;
+    delete Gimnasio->musculacion;
+
+    delete Gimnasio;
 
 }
-
