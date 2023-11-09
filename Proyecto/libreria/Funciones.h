@@ -46,19 +46,25 @@ struct GIMNASIO{
 };
 typedef struct GIMNASIO Sgym;
 
-//Buscar,reservar,eliminar reserva, chequear que el cliente tenga tiempo o no superponga acts
+
 ini inicializarVariablesFijas(Sgym* Gimnasio);//puedo llamar a esta funcion para "reiniciar el dia"
+//------------------------------------------BUSCAR--------------------------------------------------
 int BuscarActividadPorNombre(Sgym ActsGim,str actividadPasada);//devuelve la posicion donde lo encuentra
 int BuscarActividadPorHorario(Sgym ActsGim,int horarioelegido,int posN);//recibira el dato de la otra funcion buscar y devuelve la posicion de la hora
-//int BuscarCliente
-//bool chequear estado-->me devuelve true o false
-//Chequear datos
+int BuscarClientePorId(Sgym Gimnasio,int idPasado);
+//-----------------------------------------CHEQUEOS--------------------------------------------------
+bool ChequearEstado(Sgym Gimnasio);
 int ChequeoActs(Scliente misActs,Sgym ActsGim,int posN,int posH);//Retorna la misma posicion
+//-----------------------------------------RESERVA---------------------------------------------------
 Eres ReservarAct(Sgym* ActsGim,Scliente *misActs,int posN,int posH,int *posRepAct);//devuelve un enum que indica si se agrego correctamente,int *posRepAct,int*posRepHor son posiciones opcionales que devuelve por puntero el codigo si y solo si se superponen los horarios
 Edesc CancelarReserva(Sgym* ActsGim,Scliente *misActs,int posN,int posH);//devuelve un enum que indica si se elimino.
 //Sacts es puntero porque va a tener que cambiar globalmente la cantidad de cupos,mientras que cliente tendra que cambiar actividad y horario.
-//ARCHIVOS
+//------------------------------------------RESIZES--------------------------------------------------
+ini ResizeCliente(Scliente*& Clientes,int &tam,int ntam);
+//-----------------------------------------ARCHIVOS--------------------------------------------------
 Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio);//deberia usar resize u otros metodos pero tengo una variable que inicia los valores de las actividades con un numero fijo
 int ContarCantClientes(ifstream& Archivo);//cuenta las lineas del archivo y devuelve el numero total
-Archi LeerArchivoClientes(ifstream& Archivo,Sgym*Gimnasio);
+Archi LeerArchivoClientes(ifstream& Archivo,Sgym*Gimnasio,int &cantclientes,int cantclientesT);
+bool ChequearDatos(ifstream& Clientes);
+void SepararFecha(string fecha, int& dia, int& mes, int& ano);
 #endif // FUNCIONES_H

@@ -8,4 +8,4 @@
 #include <sstream>
 using namespace std;
 typedef std::string str;
-
+typedef unsigned int u_int;

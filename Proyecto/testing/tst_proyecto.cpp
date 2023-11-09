@@ -2,7 +2,7 @@
 #include "Funciones.h"
 #include "FuncionesImp.cpp"
 #include "Includes.h"
-
+/*
 TEST_CASE("CASO 1")
 {
     int i;
@@ -94,7 +94,11 @@ TEST_CASE("CASO 1")
     Gimnasio->clientes[1]={"Carla","Rober","Carla.Rober@gmail.com","1 (603) 037-9228",{"Boxeo","Spinning","Spinning"},{15,11,1970},4,0,{30,0,3},{8,0,12}};
     Gimnasio->clientes[2]={"Sidney","Runolfsson","Sidney.Runolfsson@hotmail.com","1 (433) 165-6466",{"Spinning","","Spinning"},{1,4,2000},3,1,{2,0,3},{10,0,12},};
     Gimnasio->clientes[3]={"Emma","O'Connell","Emma_OConnell@gmail.com","1 (493) 966-7600",{"Spinning","Spinning","Spinning"},{12,1,1995},2,0,{1,1,3},{8,8,12}};
-
+    SECTION("RESIZE"){
+        ResizeCliente(Gimnasio->clientes,Gimnasio->CantClientes,6);
+        REQUIRE(Gimnasio->clientes!=nullptr);
+        CHECK(Gimnasio->CantClientes==6);
+    }
     SECTION("chequeoAct"){
         int pos0,posH,posN;
         posN=BuscarActividadPorNombre(*Gimnasio,"Spiing");
@@ -131,7 +135,7 @@ TEST_CASE("CASO 1")
     delete[] Gimnasio->clientes;
 
 
-    delete Gimnasio;
+   delete Gimnasio;
 }
 TEST_CASE("Inicializacion"){
     Sgym* Gimnasio=new Sgym;
@@ -154,16 +158,16 @@ TEST_CASE("Inicializacion"){
     delete Gimnasio;
 
 }
-TEST_CASE("Archivos"){
+TEST_CASE("ArchivoActividades"){
     Sgym* Gimnasio=new Sgym;
     inicializarVariablesFijas(Gimnasio);
     ifstream InputActividades;
     InputActividades.open("../iriClasesGYM.csv");
 
     SECTION("LeerArchivos"){
-        LeerArchivoActividades(InputActividades,Gimnasio);
-        REQUIRE(Gimnasio!=nullptr);
-        CHECK(Gimnasio->actividades[4].horarios[3]==16);
+    LeerArchivoActividades(InputActividades,Gimnasio);
+    REQUIRE(Gimnasio!=nullptr);
+    CHECK(Gimnasio->actividades[4].horarios[3]==16);
     }
 
 
@@ -181,4 +185,28 @@ TEST_CASE("Archivos"){
 
     delete Gimnasio;
 
+}*/
+TEST_CASE("ArchivoClientes"){
+    ifstream InputClientes;
+    InputClientes.open("../iriClientesGYM.csv");
+    Sgym* Gimnasio=new Sgym;
+
+
+
+    /*
+    SECTION("CONTARCLIENTES"){
+        int cont;
+        cont=ContarCantClientes(InputClientes);
+        REQUIRE(cont!=-1);
+    }
+*/
+    SECTION("LEERCLIENTES"){
+        int cont;
+        cont=ContarCantClientes(InputClientes);
+
+        LeerArchivoClientes(InputClientes,Gimnasio,Gimnasio->CantClientes,cont);
+    }
+    InputClientes.close();
+    delete[] Gimnasio->clientes;
+    delete Gimnasio;
 }

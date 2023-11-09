@@ -207,6 +207,30 @@ Eres ReservarAct(Sgym* ActsGim,Scliente *misActs,int posN,int posH,int *posRepAc
 
     return Reservadaconexito;
 }
+ini ResizeCliente(Scliente*& Clientes,int &tam,int ntam){
+    if(Clientes==nullptr&&ntam>0){
+        Scliente*Aux=new Scliente[ntam];
+        delete Clientes;
+        Clientes=Aux;
+        tam=ntam;
+        return inicializacionexitosa;
+    }
+    if(tam>=0&&ntam>0){
+        Scliente*Aux=new Scliente[ntam];
+        u_int longitud=(tam<ntam)?tam:ntam;
+        for(u_int i=0;i<longitud;i++)
+            Aux[i]=Clientes[i];
+        (tam>1)? delete[] Clientes:delete Clientes;
+        Clientes=Aux;
+        tam=ntam;
+        return inicializacionexitosa;
+    }else if(ntam>0){
+        Clientes=new Scliente[ntam];
+        tam=ntam;
+        return inicializacionexitosa;
+    }else ErrReservarmemoria;
+
+}
 //buscar cliente
 //Chequear datos
 //Chequear estado
@@ -218,6 +242,9 @@ Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio){
 
     if (!Archivo.is_open())
         return ErrAbrirArchivo;
+
+    Archivo.clear();
+    Archivo.seekg(0,ios::beg);//envio el puntero que recorre el archivo al inicio
 
     str header;//encabezado
     getline(Archivo,header);//separo el encabezado
@@ -269,4 +296,76 @@ Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio){
     }
 
     return ArchivoManipuladoConExito;
+}
+int ContarCantClientes(ifstream& Archivo){
+    if(!Archivo.is_open())
+        return -1;
+
+    Archivo.clear();
+    Archivo.seekg(0,ios::beg);//envio el puntero que recorre el archivo al inicio
+
+    int cont=0;
+    str encabezado,linea;
+    getline(Archivo,encabezado);//quito el encabezado
+
+    while(Archivo.good()&&!Archivo.eof()){
+        getline(Archivo,linea);
+        cont++;
+    }
+    return cont;
+}
+Archi LeerArchivoClientes(ifstream& Archivo,Sgym*Gimnasio,int &cantclientes,int cantclientesT){
+    if(!Archivo.is_open())
+        return ErrAbrirArchivo;
+
+    Archivo.clear();
+    Archivo.seekg(0,ios::beg);//envio el puntero que recorre el archivo al inicio
+
+    str encabezado,linea;
+    getline(Archivo,encabezado);//quito el encabezado
+
+    //---------AUXILIARES------
+    str idCliente,Nombre,Apellido,Mail,Telefono,FechaNac,Estado;
+    int dia,mes,anio,i;
+    i=0;
+
+    while(Archivo.good()&&getline(Archivo,linea)&&!Archivo.eof()){
+        char delimitador=',';
+        istringstream s(linea);
+        getline(s,idCliente,delimitador);
+        getline(s,Nombre,delimitador);
+        getline(s,Apellido,delimitador);
+        getline(s,Mail,delimitador);
+        getline(s,Telefono,delimitador);
+        getline(s,FechaNac,delimitador);
+        getline(s,Estado,delimitador);
+        if(cantclientes<cantclientesT)
+            ResizeCliente(Gimnasio->clientes,cantclientes,cantclientesT);//si no tengo espacio hago un resize
+        //---------------GUARDADO--------------------------
+        Gimnasio->clientes[i].idCliente=stoi(idCliente);
+        Gimnasio->clientes[i].Nom=Nombre;
+        Gimnasio->clientes[i].Ape=Apellido;
+        Gimnasio->clientes[i].Telefono=Telefono;
+        SepararFecha(FechaNac,dia,mes,anio);//separo la fecha en dia mes y año para guardarla en mi struct
+        Gimnasio->clientes[i].FechaNac.dia=dia;
+        Gimnasio->clientes[i].FechaNac.mes=mes;
+        Gimnasio->clientes[i].FechaNac.anio=anio;
+        Gimnasio->clientes[i].estado=stoi(Estado);
+        i++;
+    }
+    return ArchivoManipuladoConExito;
+}
+void SepararFecha(string fecha, int& dia, int& mes, int& anio) {
+    istringstream ss(fecha);
+    char delimitador = '-';
+    string campo;
+
+    getline(ss, campo, delimitador);
+    dia = stoi(campo);
+
+    getline(ss, campo, delimitador);
+    mes = stoi(campo);
+
+    getline(ss, campo, delimitador);
+    anio = stoi(campo);
 }

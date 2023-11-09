@@ -4,7 +4,7 @@
 int main() {
     ifstream InputActividades,InputClientes;
     ofstream TextoParaUbicarArchivo;
-    TextoParaUbicarArchivo.open("../Robertone.txt");
+    TextoParaUbicarArchivo.open("../Ubicacion.txt");
     TextoParaUbicarArchivo<<"Hola";
     InputActividades.open("../iriClasesGYM.csv");
     InputClientes.open("../iriClientesGYM.csv");
