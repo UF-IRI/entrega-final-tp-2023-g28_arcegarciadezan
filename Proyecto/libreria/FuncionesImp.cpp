@@ -148,6 +148,21 @@ int BuscarActividadPorHorario(Sgym ActsGim,int horarioelegido,int posN){
     }
     return i;
 }
+int BuscarClientePorId(Sgym Gimnasio,int idPasado){
+    int pos=0;
+    for(int i=0;i<Gimnasio.CantClientes;i++){
+        if(Gimnasio.clientes[i].idCliente==idPasado)
+            pos=i;
+    }
+    if(pos==Gimnasio.CantClientes)
+        return -1;
+    else return pos;
+}
+bool ChequearEstado(Scliente Cliente){
+    if(Cliente.estado>=0)//mayor igual a 0 tienen la cuota al dia
+        return true;
+    else return false;
+}
 int ChequeoActs(Scliente misActs,Sgym ActsGim,int posN,int posH){
     int i,cont=0,pos0=-2;//pos0 recibe un valor que no puede tomar como para poder determinar si tengo espacio o no
     if(posN==-1||posH==-1)
@@ -176,7 +191,9 @@ Eres ReservarAct(Sgym* ActsGim,Scliente *misActs,int posN,int posH,int *posRepAc
     *posRepAct=-2;//este parametro es devuelto por puntero si y solo si encuentro actividades superpuestas, para informar que clase especifica se superpone con la actividad a reservar
 
     pos0=ChequeoActs(*misActs,*ActsGim,posN,posH);
-    if(pos0==-1)
+    if(ChequearEstado(*misActs)==false)
+        return ErrFaltadePago;
+    else if(pos0==-1)
         return ErrNoEncontrada;
     else if(pos0==-3)
         return ErrYaReservada;
@@ -207,6 +224,24 @@ Eres ReservarAct(Sgym* ActsGim,Scliente *misActs,int posN,int posH,int *posRepAc
 
     return Reservadaconexito;
 }
+Edesc CancelarReserva(Sgym* ActsGim,Scliente *misActs,int posN,int posH){
+    int i=0;
+    while(i<3&&misActs->iDClasereserv[i]!=ActsGim->actividades[posN].IdClase[posH]){
+        i++;
+    }
+    if(i==3)
+        return ErrNoReservada;//No encontro el id de la clase en las clases reservadas
+    else
+    {
+        //Se restablecen los valores
+        misActs->iDClasereserv[i]=0;
+        misActs->NomReserva[i]="";
+        misActs->horariosRes[i]=0;
+        //Se aumenta un cupo
+        ActsGim->actividades[posN].cupos[posH]++;
+    }
+    return Canceladaconexito;
+}
 ini ResizeCliente(Scliente*& Clientes,int &tam,int ntam){
     if(Clientes==nullptr&&ntam>0){
         Scliente*Aux=new Scliente[ntam];
@@ -236,62 +271,70 @@ ini ResizeCliente(Scliente*& Clientes,int &tam,int ntam){
 //Chequear estado
 //-------------------------------------------ARCHIVOS-------------------------------------------
 Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio){
-
-    str NomAct,horarios,id;//despues debo castearlos
-    int i,j,k,l,m,n,o;
-
     if (!Archivo.is_open())
         return ErrAbrirArchivo;
 
-    Archivo.clear();
+    Archivo.clear();//reestablezco el flujo correcto del archivo
     Archivo.seekg(0,ios::beg);//envio el puntero que recorre el archivo al inicio
+//---------------------VARIABLES NECESARIAS PARA EL ARCHIVO-------------------------
+    str header,line;//manejo de archivos
+    char delimiter= ',';//Es un csv entonces por cada coma debe contar un elemento
 
-    str header;//encabezado
     getline(Archivo,header);//separo el encabezado
-
+//---------------------AUXILIARES----------------------
+    str NomAct,horarios,id;//despues debo castearlos
+    int i,j,k,l,m,n,o,horariosI;
     i=j=k=l=m=n=o=0;
-    str line;
-    getline(Archivo,line);
-    while(Archivo.good()&&getline(Archivo,line)&&!Archivo.eof()){
 
-        char delimiter= ',';//Es un csv entonces por cada coma debe contar un elemento
+    while(Archivo.good()&&!Archivo.eof()){
+        getline(Archivo,line);
         istringstream iss(line);//permite leer los "campos de la linea"
         getline(iss,id,delimiter);//de donde leo, a donde leo, hasta donde leo
         getline(iss,NomAct,delimiter);
         getline(iss,horarios,delimiter);
-        if(NomAct.compare("Spinning")==0){
-            Gimnasio->actividades[0].horarios[i]=stoi(horarios);
-            Gimnasio->actividades[0].IdClase[i]=stoi(id);
-            i++;
-        }
-        else if(NomAct.compare("Yoga")==0){
+        horariosI=stoi(horarios);
+        if(horariosI>=8&&horariosI<=19){
+            if(NomAct.compare("Spinning")==0){
+                Gimnasio->actividades[0].horarios[i]=stoi(horarios);
+                Gimnasio->actividades[0].IdClase[i]=stoi(id);
+                i++;
+            }
+            else if(NomAct.compare("Yoga")==0){
             Gimnasio->actividades[1].horarios[j]=stoi(horarios);
             Gimnasio->actividades[1].IdClase[j]=stoi(id);
             j++;
-        }
-        else if(NomAct.compare("Pilates")==0){
-            Gimnasio->actividades[2].horarios[k]=stoi(horarios);
-            Gimnasio->actividades[2].IdClase[k]=stoi(id);
-            k++;
-        }
-        else if(NomAct.compare("Stretching")==0){
+            }
+            else if(NomAct.compare("Pilates")==0){
+                Gimnasio->actividades[2].horarios[k]=stoi(horarios);
+                Gimnasio->actividades[2].IdClase[k]=stoi(id);
+                k++;
+            }
+            else if(NomAct.compare("Stretching")==0){
             Gimnasio->actividades[3].horarios[l]=stoi(horarios);
             Gimnasio->actividades[3].IdClase[l]=stoi(id);
             l++;
-        }
-        else if(NomAct.compare("Zumba")==0){
-            Gimnasio->actividades[4].horarios[m]=stoi(horarios);
-            Gimnasio->actividades[4].IdClase[m]=stoi(id);
-            m++;
-        }
-        else if(NomAct.compare("Boxeo")==0){
-            Gimnasio->actividades[5].horarios[n]=stoi(horarios);
-            Gimnasio->actividades[5].IdClase[n]=stoi(id);
-            n++;
-        }else if(NomAct.compare("Musculacion")==0){
+            }
+            else if(NomAct.compare("Zumba")==0){
+                Gimnasio->actividades[4].horarios[m]=stoi(horarios);
+                Gimnasio->actividades[4].IdClase[m]=stoi(id);
+                m++;
+            }
+            else if(NomAct.compare("Boxeo")==0){
+                Gimnasio->actividades[5].horarios[n]=stoi(horarios);
+                Gimnasio->actividades[5].IdClase[n]=stoi(id);
+                n++;
+            }
+            else if(NomAct.compare("Musculacion")==0){
+                Gimnasio->musculacion->horarios[o]=stoi(horarios);
+                Gimnasio->musculacion->iDClase[o]=stoi(id);
+                o++;
+            }
+        }else if(horariosI>=7&&horariosI<8||horariosI>=19&&horariosI<=21){
+            if(NomAct.compare("Musculacion")==0){
             Gimnasio->musculacion->horarios[o]=stoi(horarios);
             Gimnasio->musculacion->iDClase[o]=stoi(id);
             o++;
+            }
         }
     }
 
@@ -308,10 +351,8 @@ int ContarCantClientes(ifstream& Archivo){
     str encabezado,linea;
     getline(Archivo,encabezado);//quito el encabezado
 
-    while(Archivo.good()&&!Archivo.eof()){
-        getline(Archivo,linea);
+    while(Archivo.good()&&!Archivo.eof()&&getline(Archivo,linea))
         cont++;
-    }
     return cont;
 }
 Archi LeerArchivoClientes(ifstream& Archivo,Sgym*Gimnasio,int &cantclientes,int cantclientesT){
@@ -322,16 +363,20 @@ Archi LeerArchivoClientes(ifstream& Archivo,Sgym*Gimnasio,int &cantclientes,int 
     Archivo.seekg(0,ios::beg);//envio el puntero que recorre el archivo al inicio
 
     str encabezado,linea;
+    char delimitador=',';
     getline(Archivo,encabezado);//quito el encabezado
 
     //---------AUXILIARES------
     str idCliente,Nombre,Apellido,Mail,Telefono,FechaNac,Estado;
     int dia,mes,anio,i;
     i=0;
+    //---------RESIZE----------
+    if(cantclientes<cantclientesT)
+        ResizeCliente(Gimnasio->clientes,cantclientes,cantclientesT);//si no tengo espacio hago un resize
 
-    while(Archivo.good()&&getline(Archivo,linea)&&!Archivo.eof()){
-        char delimitador=',';
-        istringstream s(linea);
+    while(Archivo.good()&&!Archivo.eof()&&i<Gimnasio->CantClientes){
+        getline(Archivo,linea);
+        stringstream s(linea);
         getline(s,idCliente,delimitador);
         getline(s,Nombre,delimitador);
         getline(s,Apellido,delimitador);
@@ -339,12 +384,11 @@ Archi LeerArchivoClientes(ifstream& Archivo,Sgym*Gimnasio,int &cantclientes,int 
         getline(s,Telefono,delimitador);
         getline(s,FechaNac,delimitador);
         getline(s,Estado,delimitador);
-        if(cantclientes<cantclientesT)
-            ResizeCliente(Gimnasio->clientes,cantclientes,cantclientesT);//si no tengo espacio hago un resize
         //---------------GUARDADO--------------------------
         Gimnasio->clientes[i].idCliente=stoi(idCliente);
         Gimnasio->clientes[i].Nom=Nombre;
         Gimnasio->clientes[i].Ape=Apellido;
+        Gimnasio->clientes[i].mail=Mail;
         Gimnasio->clientes[i].Telefono=Telefono;
         SepararFecha(FechaNac,dia,mes,anio);//separo la fecha en dia mes y año para guardarla en mi struct
         Gimnasio->clientes[i].FechaNac.dia=dia;
