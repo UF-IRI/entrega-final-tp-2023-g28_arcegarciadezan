@@ -6,6 +6,8 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <ctime>
+#include <cstdlib>  // Para rand() y srand()
 using namespace std;
 typedef std::string str;
 typedef unsigned int u_int;

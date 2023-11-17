@@ -6,7 +6,7 @@
 enum reservar{ErrNoEncontrada=-1,ErrNoHayCupos=-2,ErrYaReservada=-3,ErrHorarioNoValido=-4,ErrActividadsuperpuesta=-5,ErrMuchasReservasActivas=-6,ErrClienteNoEncontrado=-7,ErrFaltadePago=-8,Reservadaconexito=1};
 typedef enum reservar Eres;
 //-------------------------CANCELAR RESERVA------------------------------------------------
-enum DescartarReserva{ErrNoReservada=-1,Canceladaconexito=1};
+enum DescartarReserva{ErrNoEncontradaDesc=-1,ErrHorarioNoValidoDesc=-4,Canceladaconexito=1};
 typedef enum DescartarReserva Edesc;
 //--------------------INICIALIZACION DE VARIABLE-------------------------------------------
 enum inicializar{ErrReservarmemoria=-1,ErrCantidadDeClientesSobrepasada=-2, inicializacionexitosa=1};
@@ -29,7 +29,8 @@ typedef struct cliente Scliente;
 
 struct musculacion{
     Scliente* cliente;//no se cuantos clientes asignare, uso memoria dinamica
-    int* iDClase,*horarios,CantHorarios;
+    int* iDClase,CantHorarios;
+    float *horarios;
     str Nombre;
 
 };
@@ -49,9 +50,24 @@ struct GIMNASIO{
     int CantClases,CantClientes,ClientesMax;
 };
 typedef struct GIMNASIO Sgym;
+//--------------------------------------PARA EL BINARIO----------------------------------------------
+struct Inscripcion{
+    u_int idCurso;
+    time_t fechaInscripcion;
+};
+typedef struct Inscripcion Sins;
+
+struct Asistencias{
+    u_int idCliente;
+    u_int cantInscriptos;
+    Sins* CursoYfecha;//es un array porque depende de cuantos inscriptos hay en la actividad
+
+};
+typedef struct Asistencias Sasis;
 
 //-----------------------------------------FUNCIONES-------------------------------------------------
 ini inicializarVariablesFijas(Sgym* Gimnasio);//puedo llamar a esta funcion para "reiniciar el dia"
+string generarActAlAzar(u_int NUM,str* Actividades);
 //------------------------------------------BUSCAR---------------------------------------------------
 int BuscarActividadPorNombre(Sgym ActsGim,str actividadPasada);//devuelve la posicion donde lo encuentra
 int BuscarActividadPorHorario(Sgym ActsGim,int horarioelegido,int posN);//recibira el dato de la otra funcion buscar y devuelve la posicion de la hora
@@ -65,11 +81,12 @@ Edesc CancelarReserva(Sgym* ActsGim,Scliente *misActs,int posN,int posH);//devue
 //Sacts es puntero porque va a tener que cambiar globalmente la cantidad de cupos,mientras que cliente tendra que cambiar actividad y horario.
 //------------------------------------------RESIZES--------------------------------------------------
 ini ResizeCliente(Scliente*& Clientes,int &tam,int ntam);
+ini ResizeAsistencias(Sasis*& Asist,int &tam,int ntam);
 //-----------------------------------------ARCHIVOS--------------------------------------------------
 Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio);//deberia usar resize u otros metodos pero tengo una variable que inicia los valores de las actividades con un numero fijo
 int ContarCantClientes(ifstream& Archivo);//cuenta las lineas del archivo y devuelve el numero total
 Archi LeerArchivoClientes(ifstream& Archivo,Sgym*Gimnasio,int &cantclientes,int cantclientesT);
-bool ChequearDatos(ifstream& Clientes);
-Archi Asistencias(ifstream& Asistencia);
+Archi ChequearDatos(ifstream& Clientes,int*& posErrNom,int*& posErrApe, int*& posErrorTel,int*& posErrorFecha);
+Archi LeerAsistencias(ifstream& Archivo,Sasis*& Asis,int*cantidadAsis);
 void SepararFecha(string fecha, int& dia, int& mes, int& ano);
 #endif // FUNCIONES_H

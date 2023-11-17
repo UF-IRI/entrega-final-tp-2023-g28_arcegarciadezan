@@ -69,7 +69,7 @@ TEST_CASE("CASO 1")
     Gimnasio->ClientesMax=300;
     Gimnasio->CantClientes=4;
     Gimnasio->clientes=new Scliente[Gimnasio->CantClientes];
-    Gimnasio->clientes[0]={"Hugh","Monahan","Hugh.Monahan18@gmail.com","1 (415) 935-4832",{"Spinning","","Spinning"},{12,11,1990},0,1,{1,0,3},{8,0,12}};
+    Gimnasio->clientes[0]={"Hugh","Monahan","Hugh.Monahan18@gmail.com","1 (415) 935-4832",{"Spinning","Boxeo","Spinning"},{12,11,1990},0,1,{1,32,3},{8,18,12}};
     Gimnasio->clientes[1]={"Carla","Rober","Carla.Rober@gmail.com","1 (603) 037-9228",{"Boxeo","Spinning","Spinning"},{15,11,1970},4,2,{30,0,3},{8,0,12}};
     Gimnasio->clientes[2]={"Sidney","Runolfsson","Sidney.Runolfsson@hotmail.com","1 (433) 165-6466",{"Spinning","","Spinning"},{1,4,2000},3,3,{2,0,3},{10,0,12},};
     Gimnasio->clientes[3]={"Emma","O'Connell","Emma_OConnell@gmail.com","1 (493) 966-7600",{"Spinning","Spinning","Spinning"},{12,1,1995},2,4,{1,1,3},{8,8,12}};
@@ -111,7 +111,7 @@ TEST_CASE("CASO 1")
         //CHECK(pos0==1);//dio verdadero correctamente
     }
 
-   /* SECTION("RESERVA"){
+    SECTION("RESERVA"){
         int posN,posH,posrepeN;
         posrepeN=-2;
         posN=BuscarActividadPorNombre(*Gimnasio,"Boxeo");
@@ -119,11 +119,11 @@ TEST_CASE("CASO 1")
 
         ReservarAct(Gimnasio,&(Gimnasio->clientes[0]),posN,posH,&posrepeN);
         if(posrepeN!=-2)
-            cout<<"Tienes "<<Gimnasio->clientes[0].NomReserva[posrepeN]<<"a esa hora"<<endl;
+            cout<<"Tienes "<<Gimnasio->clientes[0].NomReserva[posrepeN]<<" a esa hora"<<endl;
         CHECK(Gimnasio->actividades[1].cupos[2]==29);//esa es la actividad que quiero reservar
         CHECK(Gimnasio->clientes[0].iDClasereserv[1]!=0);
-    }*/
-
+    }
+/*
     SECTION("CANCELAR RESERVA"){
         int posN,posH,posrepeN;
         posrepeN=-2;
@@ -134,7 +134,7 @@ TEST_CASE("CASO 1")
          CHECK(Gimnasio->actividades[1].cupos[2]==30);
          CHECK(Gimnasio->clientes[0].iDClasereserv[1]==0);
     }
-
+*/
     SECTION("BUSCAR CLIENTE"){
         int pos;
         bool chequeo;
@@ -207,26 +207,48 @@ TEST_CASE("ArchivoClientes"){
     ifstream InputClientes;
     InputClientes.open("../iriClientesGYM.csv");
     Sgym* Gimnasio=new Sgym;
-
-
-
-    /*
+/*
     SECTION("CONTARCLIENTES"){
         int cont;
         cont=ContarCantClientes(InputClientes);
         REQUIRE(cont!=-1);
     }
-*/
-    SECTION("LEERCLIENTES"){
-        /*int cont;
+
+   SECTION("LEERCLIENTES"){
+        int cont;
         cont=ContarCantClientes(InputClientes);
-        REQUIRE(cont==250);*/
+        REQUIRE(cont==250);
         LeerArchivoClientes(InputClientes,Gimnasio,Gimnasio->CantClientes,3);
         REQUIRE(Gimnasio->clientes[2].Ape.compare("Lanaro"));
 
         delete[] Gimnasio->clientes;
     }
 
-    InputClientes.close();
+
+    InputClientes.close();*/
     delete Gimnasio;
+
+
+
+
 }
+/*TEST_CASE("BINARIO"){
+    Sasis* asistencias=new Sasis;
+    ifstream InputAsistencias;
+    InputAsistencias.open("../asistencias_1697673600000.dat",ios::binary);
+SECTION("LEER ASISTENCIAS"){
+        int cantAsis;
+        LeerAsistencias(InputAsistencias,asistencias,&cantAsis);
+        REQUIRE(cantAsis!=0);
+        for (int i = 0; i < cantAsis; i++) {
+            delete[] asistencias[i].CursoYfecha;
+        }
+        delete[] asistencias;
+
+}
+    InputAsistencias.close();
+
+    delete asistencias;
+}
+*/
+

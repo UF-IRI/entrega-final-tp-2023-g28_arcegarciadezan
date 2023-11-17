@@ -1,8 +1,10 @@
 #include "Funciones.h"
+//------------------------------------------FUNCIONES PARA EL MAIN------------------------------------------------
 ini inicializarVariablesFijas(Sgym* Gimnasio){
     //esta funcion inicializa los datos que son fijos en mis variables, como los cupos y los id reservas(van a estar inicializados en 0)
     int i;
     Gimnasio->CantClases=6;//la cantidad de clases es fijo
+    Gimnasio->ClientesMax=300;
     Gimnasio->actividades=new Sact[Gimnasio->CantClases];
     if(Gimnasio->actividades==nullptr)
         return ErrReservarmemoria;
@@ -107,7 +109,7 @@ ini inicializarVariablesFijas(Sgym* Gimnasio){
     Gimnasio->musculacion=new musculacion;
     Gimnasio->musculacion->CantHorarios=27;
     Gimnasio->musculacion->Nombre="Musculacion";
-    Gimnasio->musculacion->horarios=new int[Gimnasio->musculacion->CantHorarios];
+    Gimnasio->musculacion->horarios=new float[Gimnasio->musculacion->CantHorarios];
     Gimnasio->musculacion->iDClase=new int[Gimnasio->musculacion->CantHorarios];
     if(Gimnasio->musculacion->horarios==nullptr)
         return ErrReservarmemoria;
@@ -117,6 +119,11 @@ ini inicializarVariablesFijas(Sgym* Gimnasio){
 
     return inicializacionexitosa;
     //libero memoria en el main, porque si borro la memoria dinamica aca no estaria inicializando nada
+}
+string generarActAlAzar(u_int NUM,str* Actividades) {
+    // Usar la función rand() para seleccionar un índice al azar
+    int i = rand() % NUM;
+    return Actividades[i];
 }
 int BuscarActividadPorNombre(Sgym ActsGim,str actividadPasada){
     int i;
@@ -195,8 +202,17 @@ Eres ReservarAct(Sgym* ActsGim,Scliente *misActs,int posN,int posH,int *posRepAc
         return ErrFaltadePago;
     else if(pos0==-1)
         return ErrNoEncontrada;
-    else if(pos0==-3)
+    else if(pos0==-3){
+        for(int i=0;i<3;i++)
+        {
+            if(ActsGim->actividades[posN].IdClase[posH]==misActs->iDClasereserv[i]){
+                contrepe++;
+                *posRepAct=i;
+            }
+
+        }//Me dice cual es la actividad repetida
         return ErrYaReservada;
+    }
     else if(pos0==-4)
         return ErrHorarioNoValido;
     else if(pos0==-6)
@@ -204,14 +220,7 @@ Eres ReservarAct(Sgym* ActsGim,Scliente *misActs,int posN,int posH,int *posRepAc
     else if(ActsGim->actividades[posN].cupos[posH]==0)
         return ErrNoHayCupos;
 
-    for(int i=0;i<3;i++)
-    {
-        if(ActsGim->actividades[posN].horarios[posH]==misActs->horariosRes[i]){
-            contrepe++;
-            *posRepAct=i;
-        }
 
-    }
     //agarrar los id de la clase dentro de la structura del cliente y comparar esos horarios con el de la nueva actividad
     if(contrepe!=0)
         return ErrActividadsuperpuesta;
@@ -225,12 +234,22 @@ Eres ReservarAct(Sgym* ActsGim,Scliente *misActs,int posN,int posH,int *posRepAc
     return Reservadaconexito;
 }
 Edesc CancelarReserva(Sgym* ActsGim,Scliente *misActs,int posN,int posH){
-    int i=0;
-    while(i<3&&misActs->iDClasereserv[i]!=ActsGim->actividades[posN].IdClase[posH]){
+    int i,pos=-1;
+    if(posN==-1)
+        return ErrNoEncontradaDesc;
+    else if(posH==-1)
+        return ErrNoEncontradaDesc;
+    else if(posH==-4)
+        return ErrHorarioNoValidoDesc;
+    /*while(i<3&&misActs->iDClasereserv[i]!=ActsGim->actividades[posN].IdClase[posH]){
         i++;
+    }*///por alguna razon cada vez que intento usar este formato me salta un segmentation fault;
+    for(i=0;i<3;i++){
+        if(misActs->iDClasereserv[i]==ActsGim->actividades[posN].IdClase[posH])
+            pos=i;
     }
-    if(i==3)
-        return ErrNoReservada;//No encontro el id de la clase en las clases reservadas
+    if(pos==-1)
+        return ErrNoEncontradaDesc;//No encontro el id de la clase en las clases reservadas
     else
     {
         //Se restablecen los valores
@@ -286,8 +305,8 @@ Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio){
     int i,j,k,l,m,n,o,horariosI;
     i=j=k=l=m=n=o=0;
 
-    while(Archivo.good()&&!Archivo.eof()){
-        getline(Archivo,line);
+    while(getline(Archivo,line),Archivo.good()&&!Archivo.eof()){
+
         istringstream iss(line);//permite leer los "campos de la linea"
         getline(iss,id,delimiter);//de donde leo, a donde leo, hasta donde leo
         getline(iss,NomAct,delimiter);
@@ -332,7 +351,7 @@ Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio){
         }else if(horariosI>=7&&horariosI<8||horariosI>=19&&horariosI<=21){
             if(NomAct.compare("Musculacion")==0){
             Gimnasio->musculacion->horarios[o]=stoi(horarios);
-            Gimnasio->musculacion->iDClase[o]=stoi(id);
+            Gimnasio->musculacion->iDClase[o]=stof(id);
             o++;
             }
         }
@@ -413,3 +432,66 @@ void SepararFecha(string fecha, int& dia, int& mes, int& anio) {
     getline(ss, campo, delimitador);
     anio = stoi(campo);
 }
+/*
+Archi ChequearDatos(ifstream& Clientes,int*& posErrNom,int*& posErrApe, int*& posErrorTel,int*& posErrorFecha){
+
+}
+Archi LeerAsistencias(ifstream& Archivo,Sasis*& asistencia,int*cantidadAsis){
+    if(!Archivo.is_open())
+        return ErrAbrirArchivo;
+
+    // INICIALIZO VARIABLES
+    int cantAsistencias = 0;
+    int contadorAsistencias = 0;
+    Archivo.clear();
+    Archivo.seekg(0,ios::beg);
+
+    //Leo hasta el final el archivo
+    asistencia=new Asistencias;
+    while (!Archivo.eof()) {
+
+        Archivo.read((char*)&asistencia->idCliente, sizeof(u_int));//uso int y no u_int por como lo declare al tipo de dato
+        Archivo.read((char*)&asistencia->cantInscriptos, sizeof(u_int));
+
+        Inscripcion* registrados= new Inscripcion[asistencia->cantInscriptos];
+        Inscripcion*Aux=registrados;//mismo tamaño
+        for(int i=0;i<asistencia->cantInscriptos;i++){
+            Archivo.read((char*)Aux,sizeof(Inscripcion));
+            Aux++;//Muevo el puntero a la siguiente pos
+        }
+        asistencia->CursoYfecha=Aux;
+
+        //Cuento la cantidad de asistencias(creo)
+        contadorAsistencias++;
+        ResizeAsistencias(asistencia,cantAsistencias,contadorAsistencias);//No es lo mas optimo pero no entiendo del todo como funcionan los binarios
+    }
+    cantidadAsis=&contadorAsistencias;
+
+    return ArchivoManipuladoConExito;
+}
+ini ResizeAsistencias(Sasis*& Asist,int &tam,int ntam){
+    if(Asist==nullptr&&ntam>0){
+        Sasis*Aux=new Sasis[ntam];
+        delete Asist;
+        Asist=Aux;
+        tam=ntam;
+        return inicializacionexitosa;
+    }
+    if(tam>=0&&ntam>0){
+        Sasis*Aux=new Sasis[ntam];
+        u_int longitud=(tam<ntam)?tam:ntam;
+        for(u_int i=0;i<longitud;i++)
+            Aux[i]=Asist[i];
+        (tam>1)? delete[] Asist:delete Asist;
+        Asist=Aux;
+        tam=ntam;
+        return inicializacionexitosa;
+    }else if(ntam>0){
+        Asist=new Sasis[ntam];
+        tam=ntam;
+        return inicializacionexitosa;
+    }else ErrReservarmemoria;
+
+}*/
+
+
