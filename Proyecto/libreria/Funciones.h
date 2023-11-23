@@ -43,13 +43,7 @@ struct actividad{
 };
 typedef struct actividad Sact;
 
-struct GIMNASIO{
-    Scliente* clientes;//Hago uso de memoria dinamica porque no se cuantos clientes voy a recibir
-    Sact* actividades;//se que hay 6 actividades pero usar la memoria dinamica asegura un uso mas general del codigo
-    Smusc* musculacion;
-    int CantClases,CantClientes,ClientesMax;
-};
-typedef struct GIMNASIO Sgym;
+
 //--------------------------------------PARA EL BINARIO----------------------------------------------
 struct Inscripcion{
     u_int idCurso;
@@ -64,6 +58,14 @@ struct Asistencias{
 
 };
 typedef struct Asistencias Sasis;
+struct GIMNASIO{
+    Scliente* clientes;//Hago uso de memoria dinamica porque no se cuantos clientes voy a recibir
+    Sact* actividades;//se que hay 6 actividades pero usar la memoria dinamica asegura un uso mas general del codigo
+    Smusc* musculacion;
+    int CantClases,CantClientes,ClientesMax;
+    Sasis* asistencias;
+};
+typedef struct GIMNASIO Sgym;
 
 //-----------------------------------------FUNCIONES-------------------------------------------------
 ini inicializarVariablesFijas(Sgym* Gimnasio);//puedo llamar a esta funcion para "reiniciar el dia"
@@ -86,7 +88,7 @@ ini ResizeAsistencias(Sasis*& Asist,int &tam,int ntam);
 Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio);//deberia usar resize u otros metodos pero tengo una variable que inicia los valores de las actividades con un numero fijo
 int ContarCantClientes(ifstream& Archivo);//cuenta las lineas del archivo y devuelve el numero total
 Archi LeerArchivoClientes(ifstream& Archivo,Sgym*Gimnasio,int &cantclientes,int cantclientesT);
-Archi ChequearDatos(ifstream& Clientes,int*& posErrNom,int*& posErrApe, int*& posErrorTel,int*& posErrorFecha);
+//Archi ChequearDatos(ifstream& Clientes,int*& posErrNom,int*& posErrApe, int*& posErrorTel,int*& posErrorFecha);
 Archi LeerAsistencias(ifstream& Archivo,Sasis*& Asis,int*cantidadAsis);
 void SepararFecha(string fecha, int& dia, int& mes, int& ano);
 #endif // FUNCIONES_H

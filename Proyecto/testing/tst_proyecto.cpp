@@ -123,7 +123,7 @@ TEST_CASE("CASO 1")
         CHECK(Gimnasio->actividades[1].cupos[2]==29);//esa es la actividad que quiero reservar
         CHECK(Gimnasio->clientes[0].iDClasereserv[1]!=0);
     }
-/*
+    /*
     SECTION("CANCELAR RESERVA"){
         int posN,posH,posrepeN;
         posrepeN=-2;
@@ -152,7 +152,7 @@ TEST_CASE("CASO 1")
     delete[] Gimnasio->clientes;
 
 
-   delete Gimnasio;
+    delete Gimnasio;
 }
 TEST_CASE("Inicializacion"){
     Sgym* Gimnasio=new Sgym;
@@ -182,9 +182,9 @@ TEST_CASE("ArchivoActividades"){
     InputActividades.open("../iriClasesGYM.csv");
 
     SECTION("LeerArchivos"){
-    LeerArchivoActividades(InputActividades,Gimnasio);
-    REQUIRE(Gimnasio!=nullptr);
-    CHECK(Gimnasio->actividades[4].horarios[3]==16);
+        LeerArchivoActividades(InputActividades,Gimnasio);
+        REQUIRE(Gimnasio!=nullptr);
+        CHECK(Gimnasio->actividades[4].horarios[3]==16);
     }
 
 
@@ -207,48 +207,49 @@ TEST_CASE("ArchivoClientes"){
     ifstream InputClientes;
     InputClientes.open("../iriClientesGYM.csv");
     Sgym* Gimnasio=new Sgym;
-/*
+    /*
     SECTION("CONTARCLIENTES"){
         int cont;
         cont=ContarCantClientes(InputClientes);
         REQUIRE(cont!=-1);
-    }
+    }*/
 
-   SECTION("LEERCLIENTES"){
+    SECTION("LEERCLIENTES"){
         int cont;
         cont=ContarCantClientes(InputClientes);
         REQUIRE(cont==250);
         LeerArchivoClientes(InputClientes,Gimnasio,Gimnasio->CantClientes,3);
-        REQUIRE(Gimnasio->clientes[2].Ape.compare("Lanaro"));
+        REQUIRE(Gimnasio->clientes[2].Ape=="Lanaro");
 
         delete[] Gimnasio->clientes;
     }
 
 
-    InputClientes.close();*/
+    InputClientes.close();
     delete Gimnasio;
 
 
 
 
 }
-/*TEST_CASE("BINARIO"){
-    Sasis* asistencias=new Sasis;
+TEST_CASE("BINARIO"){
+    Sgym* Gimnasio=new Sgym;
     ifstream InputAsistencias;
     InputAsistencias.open("../asistencias_1697673600000.dat",ios::binary);
-SECTION("LEER ASISTENCIAS"){
-        int cantAsis;
-        LeerAsistencias(InputAsistencias,asistencias,&cantAsis);
+    SECTION("LEER ASISTENCIAS"){
+        int cantAsis=0;
+        LeerAsistencias(InputAsistencias,Gimnasio->asistencias,&cantAsis);
         REQUIRE(cantAsis!=0);
+        REQUIRE(Gimnasio->asistencias[3].idCliente==6);
         for (int i = 0; i < cantAsis; i++) {
-            delete[] asistencias[i].CursoYfecha;
+            delete[] Gimnasio->asistencias[i].CursoYfecha;
         }
-        delete[] asistencias;
+        delete[] Gimnasio->asistencias;
 
-}
+    }
     InputAsistencias.close();
 
-    delete asistencias;
+    delete Gimnasio;
 }
-*/
+
 

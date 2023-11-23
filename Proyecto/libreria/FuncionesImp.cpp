@@ -295,12 +295,12 @@ Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio){
 
     Archivo.clear();//reestablezco el flujo correcto del archivo
     Archivo.seekg(0,ios::beg);//envio el puntero que recorre el archivo al inicio
-//---------------------VARIABLES NECESARIAS PARA EL ARCHIVO-------------------------
+    //---------------------VARIABLES NECESARIAS PARA EL ARCHIVO-------------------------
     str header,line;//manejo de archivos
     char delimiter= ',';//Es un csv entonces por cada coma debe contar un elemento
 
     getline(Archivo,header);//separo el encabezado
-//---------------------AUXILIARES----------------------
+    //---------------------AUXILIARES----------------------
     str NomAct,horarios,id;//despues debo castearlos
     int i,j,k,l,m,n,o,horariosI;
     i=j=k=l=m=n=o=0;
@@ -319,9 +319,9 @@ Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio){
                 i++;
             }
             else if(NomAct.compare("Yoga")==0){
-            Gimnasio->actividades[1].horarios[j]=stoi(horarios);
-            Gimnasio->actividades[1].IdClase[j]=stoi(id);
-            j++;
+                Gimnasio->actividades[1].horarios[j]=stoi(horarios);
+                Gimnasio->actividades[1].IdClase[j]=stoi(id);
+                j++;
             }
             else if(NomAct.compare("Pilates")==0){
                 Gimnasio->actividades[2].horarios[k]=stoi(horarios);
@@ -329,9 +329,9 @@ Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio){
                 k++;
             }
             else if(NomAct.compare("Stretching")==0){
-            Gimnasio->actividades[3].horarios[l]=stoi(horarios);
-            Gimnasio->actividades[3].IdClase[l]=stoi(id);
-            l++;
+                Gimnasio->actividades[3].horarios[l]=stoi(horarios);
+                Gimnasio->actividades[3].IdClase[l]=stoi(id);
+                l++;
             }
             else if(NomAct.compare("Zumba")==0){
                 Gimnasio->actividades[4].horarios[m]=stoi(horarios);
@@ -350,9 +350,9 @@ Archi LeerArchivoActividades(ifstream& Archivo,Sgym* Gimnasio){
             }
         }else if(horariosI>=7&&horariosI<8||horariosI>=19&&horariosI<=21){
             if(NomAct.compare("Musculacion")==0){
-            Gimnasio->musculacion->horarios[o]=stoi(horarios);
-            Gimnasio->musculacion->iDClase[o]=stof(id);
-            o++;
+                Gimnasio->musculacion->horarios[o]=stoi(horarios);
+                Gimnasio->musculacion->iDClase[o]=stof(id);
+                o++;
             }
         }
     }
@@ -432,40 +432,43 @@ void SepararFecha(string fecha, int& dia, int& mes, int& anio) {
     getline(ss, campo, delimitador);
     anio = stoi(campo);
 }
-/*
-Archi ChequearDatos(ifstream& Clientes,int*& posErrNom,int*& posErrApe, int*& posErrorTel,int*& posErrorFecha){
 
-}
+//Archi ChequearDatos(ifstream& Clientes,int*& posErrNom,int*& posErrApe, int*& posErrorTel,int*& posErrorFecha){
+//}
 Archi LeerAsistencias(ifstream& Archivo,Sasis*& asistencia,int*cantidadAsis){
     if(!Archivo.is_open())
         return ErrAbrirArchivo;
-
-    // INICIALIZO VARIABLES
-    int cantAsistencias = 0;
-    int contadorAsistencias = 0;
     Archivo.clear();
     Archivo.seekg(0,ios::beg);
-
-    //Leo hasta el final el archivo
-    asistencia=new Asistencias;
-    while (!Archivo.eof()) {
-
-        Archivo.read((char*)&asistencia->idCliente, sizeof(u_int));//uso int y no u_int por como lo declare al tipo de dato
-        Archivo.read((char*)&asistencia->cantInscriptos, sizeof(u_int));
-
-        Inscripcion* registrados= new Inscripcion[asistencia->cantInscriptos];
-        Inscripcion*Aux=registrados;//mismo tamaño
-        for(int i=0;i<asistencia->cantInscriptos;i++){
-            Archivo.read((char*)Aux,sizeof(Inscripcion));
-            Aux++;//Muevo el puntero a la siguiente pos
+    //-----------------------------VARIABLES------------------------------------
+    int i=0;
+    u_int contadorasis=0;
+    Sasis* Aux=new Sasis;
+    while(Archivo.read((char*)&Aux->idCliente,sizeof(u_int))&&!Archivo.eof()){
+        Archivo.read((char*)&Aux->cantInscriptos,sizeof(u_int));
+        Inscripcion* Inscriptos=new Inscripcion[Aux->cantInscriptos];
+        Inscripcion* AuxI=Inscriptos;
+        for(int j=0;j<Aux->cantInscriptos;j++){
+            Archivo.read((char*)&AuxI[j],sizeof(Inscripcion));
         }
-        asistencia->CursoYfecha=Aux;
+        contadorasis++;
+    }//Soy consciente que esto esta pegando datos innecesariamente pero no se me ocurrio otra manera de contar cuantos hay
+    delete Aux;
+    Archivo.clear();
+    Archivo.seekg(0,ios::beg);
+    asistencia=new Sasis;
+    ResizeAsistencias(asistencia,*cantidadAsis,contadorasis);
+    while(!Archivo.eof()&&i<*cantidadAsis){
+        Archivo.read((char*)&asistencia[i].idCliente,sizeof(u_int));
+        Archivo.read((char*)&asistencia[i].cantInscriptos,sizeof(u_int));
 
-        //Cuento la cantidad de asistencias(creo)
-        contadorAsistencias++;
-        ResizeAsistencias(asistencia,cantAsistencias,contadorAsistencias);//No es lo mas optimo pero no entiendo del todo como funcionan los binarios
+        Inscripcion* Inscriptos=new Inscripcion[asistencia[i].cantInscriptos];
+        asistencia[i].CursoYfecha=Inscriptos;
+        for(int j=0;j<asistencia[i].cantInscriptos;j++){
+            Archivo.read((char*)&asistencia[i].CursoYfecha[j],sizeof(Inscripcion));
+        }
+        i++;
     }
-    cantidadAsis=&contadorAsistencias;
 
     return ArchivoManipuladoConExito;
 }
@@ -482,7 +485,10 @@ ini ResizeAsistencias(Sasis*& Asist,int &tam,int ntam){
         u_int longitud=(tam<ntam)?tam:ntam;
         for(u_int i=0;i<longitud;i++)
             Aux[i]=Asist[i];
-        (tam>1)? delete[] Asist:delete Asist;
+        if(tam>1)
+            delete[] Asist;
+        else
+            delete Asist;
         Asist=Aux;
         tam=ntam;
         return inicializacionexitosa;
@@ -492,6 +498,5 @@ ini ResizeAsistencias(Sasis*& Asist,int &tam,int ntam){
         return inicializacionexitosa;
     }else ErrReservarmemoria;
 
-}*/
-
+}
 

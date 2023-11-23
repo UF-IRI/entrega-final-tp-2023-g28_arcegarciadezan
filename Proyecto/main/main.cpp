@@ -4,18 +4,19 @@
 
 int main() {
     srand(time(NULL));
-//---------------------------------------------VARIABLES------------------------------------------------
+    //---------------------------------------------VARIABLES------------------------------------------------
     ifstream InputActividades,InputClientes,InputAsistencias;
-    ofstream TextoParaUbicarArchivo,InformeGym;
-    int cont=0;
+    ofstream TextoParaUbicarArchivo,InformeGym,InformeAsis;
+    int cont=0,cantasis=0;
     Sgym* Gimnasio=new Sgym;
-//--------------------------------------INICIALIZACION/APERTURA-----------------------------------------
+    //--------------------------------------INICIALIZACION/APERTURA-----------------------------------------
     TextoParaUbicarArchivo.open("../Ubicacion.txt");
     TextoParaUbicarArchivo<<"Hola";
     InputActividades.open("../iriClasesGYM.csv");
     InputClientes.open("../iriClientesGYM.csv");
     InputAsistencias.open("../asistencias_1697673600000.dat",ios::binary);
     InformeGym.open("../InformeGym.txt");
+    //InformeAsis.open("../asistencias_1697673600000.dat",ios::binary);
 
     if (!InputActividades.is_open())
         cout << "Error al abrir archivo Actividades" << endl;
@@ -23,13 +24,14 @@ int main() {
         cout << "Error al abrir archivo Clientes" << endl;
     if(!InputAsistencias.is_open())
         cout<<"Error al abrir archivo Asistencias"<< endl;
-//------------------------------------------INICIALIZO LAS VARIABLES----------------------------------------------------------
+    //------------------------------------------INICIALIZO LAS VARIABLES----------------------------------------------------------
     inicializarVariablesFijas(Gimnasio);
     LeerArchivoActividades(InputActividades,Gimnasio);
     cont=ContarCantClientes(InputClientes);
     LeerArchivoClientes(InputClientes,Gimnasio,Gimnasio->CantClientes,cont);
+    LeerAsistencias(InputAsistencias,Gimnasio->asistencias,&cantasis);
 
-//---------------------------------------------DATOS DE PRUEBA EXITOSOS-------------------------------------------------------
+    //---------------------------------------------DATOS DE PRUEBA EXITOSOS-------------------------------------------------------
     str ActividadesCorrectas[7]={"Spinning","Stretching","Boxeo","Musculacion","Yoga","Zumba","Pilates"};
     u_int cantActs=7;
     str ActElegida;
@@ -67,10 +69,13 @@ int main() {
         else
             contErrores++;
     }
+    for(int i=0;i<20;i++){
+
+    }
     InformeGym<<"------------------CANCELACIONES------------------"<<endl;
     InformeGym<<"Se Cancelaron: "<<contCancelaciones<<" actividades con exito"<<endl;
     InformeGym<<"Hubo "<<contErrores<<" errores al cancelar las reservas"<<endl;
- /*
+    /*
 //--------------------------------DATOS DE PRUEBA QUE TIENEN QUE FALLAR-------------------------------------------------------
     str ActividadesIncorrectas[7]={"Spinng","Streing","Box","Muscacion","Yoa","Zmba","Pites"};
     u_int cantActs=7;
@@ -106,18 +111,24 @@ int main() {
             contErrores++;
     }
    */
-//-----------------------------------------------CERRAR ARCHIVOS--------------------------------------------------------------
+    //-----------------------------------------------CERRAR ARCHIVOS--------------------------------------------------------------
     TextoParaUbicarArchivo.close();
     InputClientes.close();
     InputActividades.close();
     InputAsistencias.close();
     InformeGym.close();
-//--------------------------------------------ELIMINACION DINAMICAS----------------------------------------------------------
+    //InformeAsis.close();
+
+    //--------------------------------------------ELIMINACION DINAMICAS----------------------------------------------------------
     for (int i = 0; i < Gimnasio->CantClases; ++i) {
         delete[] Gimnasio->actividades[i].horarios;
         delete[] Gimnasio->actividades[i].cupos;
         delete[] Gimnasio->actividades[i].IdClase;
     }
+    for (int i = 0; i < cantasis; i++) {
+        delete[] Gimnasio->asistencias[i].CursoYfecha;
+    }
+    delete[] Gimnasio->asistencias;
     delete[] Gimnasio->actividades;
     delete[] Gimnasio->musculacion->horarios;
     delete[] Gimnasio->musculacion->iDClase;
