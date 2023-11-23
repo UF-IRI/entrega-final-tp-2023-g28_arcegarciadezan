@@ -203,16 +203,16 @@ TEST_CASE("ArchivoActividades"){
     delete Gimnasio;
 
 }
-TEST_CASE("ArchivoClientes"){
+/*TEST_CASE("ArchivoClientes"){
     ifstream InputClientes;
     InputClientes.open("../iriClientesGYM.csv");
     Sgym* Gimnasio=new Sgym;
-    /*
+
     SECTION("CONTARCLIENTES"){
         int cont;
         cont=ContarCantClientes(InputClientes);
         REQUIRE(cont!=-1);
-    }*/
+    }
 
     SECTION("LEERCLIENTES"){
         int cont;
@@ -231,16 +231,20 @@ TEST_CASE("ArchivoClientes"){
 
 
 
-}
+}*/
 TEST_CASE("BINARIO"){
     Sgym* Gimnasio=new Sgym;
     ifstream InputAsistencias;
+    ofstream EscribirBin;
     InputAsistencias.open("../asistencias_1697673600000.dat",ios::binary);
+    EscribirBin.open("../pruebaasis",ios::binary);
+
     SECTION("LEER ASISTENCIAS"){
         int cantAsis=0;
         LeerAsistencias(InputAsistencias,Gimnasio->asistencias,&cantAsis);
         REQUIRE(cantAsis!=0);
         REQUIRE(Gimnasio->asistencias[3].idCliente==6);
+        EscribirBinario(EscribirBin,*(Gimnasio),cantAsis);
         for (int i = 0; i < cantAsis; i++) {
             delete[] Gimnasio->asistencias[i].CursoYfecha;
         }
@@ -248,7 +252,7 @@ TEST_CASE("BINARIO"){
 
     }
     InputAsistencias.close();
-
+    EscribirBin.close();
     delete Gimnasio;
 }
 

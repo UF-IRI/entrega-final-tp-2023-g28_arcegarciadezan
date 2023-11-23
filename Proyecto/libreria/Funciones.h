@@ -90,5 +90,6 @@ int ContarCantClientes(ifstream& Archivo);//cuenta las lineas del archivo y devu
 Archi LeerArchivoClientes(ifstream& Archivo,Sgym*Gimnasio,int &cantclientes,int cantclientesT);
 //Archi ChequearDatos(ifstream& Clientes,int*& posErrNom,int*& posErrApe, int*& posErrorTel,int*& posErrorFecha);
 Archi LeerAsistencias(ifstream& Archivo,Sasis*& Asis,int*cantidadAsis);
+Archi EscribirBinario(ofstream& Archivo, Sgym Gimnasio,int cantidadAsis);
 void SepararFecha(string fecha, int& dia, int& mes, int& ano);
 #endif // FUNCIONES_H

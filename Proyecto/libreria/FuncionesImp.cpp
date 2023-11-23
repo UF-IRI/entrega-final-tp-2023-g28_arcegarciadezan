@@ -499,4 +499,17 @@ ini ResizeAsistencias(Sasis*& Asist,int &tam,int ntam){
     }else ErrReservarmemoria;
 
 }
+Archi EscribirBinario(ofstream& Archivo, Sgym Gimnasio,int cantidadAsis){
+    if(!Archivo.is_open())
+        return ErrAbrirArchivo;
+    Archivo.seekp(0,ios::end);//situo el puntero al final para no sobreescrbir los datos
+    for(int i=0;i<cantidadAsis;i++){
+        Archivo.write((char*)&Gimnasio.asistencias[i].idCliente,sizeof(u_int));
+        Archivo.write((char*)&Gimnasio.asistencias[i].cantInscriptos,sizeof(u_int));
 
+        for(int j=0;j<Gimnasio.asistencias[i].cantInscriptos;j++){
+            Archivo.write((char*)&Gimnasio.asistencias[i].CursoYfecha[j],sizeof(Inscripcion));
+        }
+    }
+    return ArchivoManipuladoConExito;
+}
